@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniStorage Pro | Intelligent Disk Analyzer, Heatmap & Safe Cleaner</title>
+  <meta name="description"
+    content="State-of-the-art storage visualizer with interactive heatmap, squarified treemaps, safe disk cleanup recommendations, and system file protection for Windows laptops.">
+  <meta name="keywords"
+    content="disk analyzer, storage manager, windirstat, tree size, heatmap, disk cleanup, windows storage sense">
+
+  <!-- Modern Typography (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/treemap.css">
+  <link rel="stylesheet" href="css/cleaner.css">
+</head>
+
+<body>
+
+  <!-- ================= Application Header ================= -->
+  <header class="app-header" id="appHeader">
+    <div class="brand-section">
+      <div class="logo-badge" id="appLogoBadge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+          <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+        </svg>
+      </div>
+      <div class="brand-title-wrap">
+        <h1>OmniStorage</h1>
+      </div>
+
+      <!-- Live Laptop Specs Pill -->
+      <div class="system-pill" id="systemPill">
+        <div class="system-dot"></div>
+        <span id="systemPillText">Analyzing hardware & logical drives...</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Quick Reclaim Pill in Header -->
+      <div class="reclaim-highlight-box" style="padding: 0.35rem 0.85rem; border-radius: var(--radius-full);"
+        id="headerReclaimBox">
+        <div class="reclaim-highlight-icon" style="width: 24px; height: 24px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-secondary);">
+          Reclaimable: <strong id="headerReclaimSize" class="reclaim-num"
+            style="font-size: 0.95rem;">Scanning...</strong>
+        </div>
+      </div>
+
+      <!-- Open Windows Storage Sense Button -->
+      <button class="btn-action-outline" id="btnOpenStorageSense" title="Launch Native Windows Storage Settings">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path
+            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+          </path>
+        </svg>
+        Storage Sense
+      </button>
+
+      <!-- Refresh Button -->
+      <button class="btn-icon" id="btnRefreshAll" title="Refresh Disk Space Audit">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+      </button>
+
+      <!-- Theme Switcher -->
+      <button class="btn-icon" id="btnThemeToggle" title="Toggle Dark/Light Mode">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= Main Body Layout ================= -->
+  <main class="main-wrapper">
+
+    <!-- Global Total Summary & Laptop Drives Deck -->
+    <section aria-label="System Storage Overview">
+      <div class="drives-deck" id="drivesDeck">
+        <!-- Rendered dynamically by app.js: C: (OS) 376GB, Z: (PIRATE) 100GB -->
+      </div>
+    </section>
+
+    <!-- Main Navigation Tab Bar -->
+    <nav class="nav-tab-bar" id="mainTabBar" aria-label="Application Tabs">
+      <button class="tab-btn active" id="tabBtnHeatmap" data-tab="viewHeatmap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="3" y1="9" x2="21" y2="9"></line>
+          <line x1="9" y1="21" x2="9" y2="9"></line>
+        </svg>
+        Interactive Heatmap & Treemap
+      </button>
+
+      <button class="tab-btn" id="tabBtnCleaner" data-tab="viewCleaner">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"></polyline>
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        Smart Cleaner & Reclaim Hub
+        <span class="badge-counter" id="badgeCleanCount">Audit Ready</span>
+      </button>
+
+      <button class="tab-btn" id="tabBtnDevHunter" data-tab="viewDevHunter">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 18 22 12 16 6"></polyline>
+          <polyline points="8 6 2 12 8 18"></polyline>
+        </svg>
+        Dev & Build Hunter
+        <span class="badge-counter" id="badgeDevHunterCount"
+          style="background: rgba(6, 182, 212, 0.25); color: var(--accent-cyan); border: 1px solid rgba(6, 182, 212, 0.4); font-weight: 700;">29.1
+          GB</span>
+      </button>
+
+      <button class="tab-btn" id="tabBtnLeaderboard" data-tab="viewLeaderboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        Largest Files Leaderboard
+      </button>
+
+      <button class="tab-btn" id="tabBtnSystemInfo" data-tab="viewSystemInfo">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        System Protection & Safety Rules
+      </button>
+    </nav>
+
+    <!-- ================= TAB 1: INTERACTIVE TREEMAP & HEATMAP ================= -->
+    <section class="tab-view active" id="viewHeatmap" aria-label="Heatmap Visualizer">
+      <div class="treemap-module">
+
+        <!-- Top Heatmap Toolbar -->
+        <div class="treemap-toolbar">
+          <!-- Drilldown Breadcrumbs -->
+          <div class="breadcrumb-trail" id="breadcrumbTrail">
+            <span class="breadcrumb-item active">Drive C:\</span>
+          </div>
+
+          <!-- Controls Right -->
+          <div class="toolbar-actions">
+            <!-- Scope Selector (Switch Drive / User Folder) -->
+            <div class="scope-select-wrap">
+              <select class="custom-select" id="scopeSelector" title="Choose disk drive or folder to visualize">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+
+            <!-- Color Mode Dropdown -->
+            <select class="custom-select" id="colorModeSelect" title="Color palette grouping">
+              <option value="category">Color by Category (Media, Code, System, Apps)</option>
+              <option value="safety">Color by Safety Status (Safe to Clear, Review, Protected)</option>
+            </select>
+
+            <!-- Hide System Files Toggle -->
+            <div class="system-filter-toggle" id="toggleHideSystem" title="Exclude Windows System files from heatmap">
+              <span>🛡️ System Files Visible</span>
+            </div>
+
+            <!-- View Mode Switcher (Treemap vs Sunburst) -->
+            <div class="view-mode-group">
+              <button class="view-mode-btn active" id="btnModeTreemap" title="Squarified Heatmap Blocks">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                Treemap
+              </button>
+              <button class="view-mode-btn" id="btnModeSunburst" title="Radial Sunburst Rings">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <circle cx="12" cy="12" r="4"></circle>
+                </svg>
+                Sunburst
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- HTML5 Canvas Container -->
+        <div class="treemap-canvas-container" id="treemapCanvasContainer">
+          <canvas id="treemapCanvas"></canvas>
+
+          <!-- Loading Radar Overlay -->
+          <div class="treemap-overlay-loader" id="treemapLoader">
+            <div class="radar-spinner"></div>
+            <div class="loader-text">Analyzing Disk Topology & Space Distribution...</div>
+            <div class="loader-subtext" id="loaderPath">Reading file clusters...</div>
+          </div>
+
+          <!-- Floating Tooltip Card -->
+          <div class="treemap-tooltip" id="treemapTooltip">
+            <div class="tooltip-title-wrap">
+              <div class="tooltip-title">Folder Name</div>
+              <span class="tooltip-category-pill">Media</span>
+            </div>
+            <div class="tooltip-size-row">
+              <div class="tooltip-size">0.00 GB</div>
+              <div class="tooltip-pct">(0%)</div>
+            </div>
+            <div class="tooltip-path">C:\Users\...</div>
+            <div class="tooltip-hint">Click to dive inside</div>
+          </div>
+        </div>
+
+        <!-- Category Legend Pills -->
+        <div class="category-legend-deck" id="categoryLegendDeck">
+          <div class="legend-items-list">
+            <div class="legend-pill" data-cat="system">
+              <div class="legend-swatch" style="background: var(--cat-system);"></div>
+              <span>System Protected</span>
+            </div>
+            <div class="legend-pill" data-cat="media">
+              <div class="legend-swatch" style="background: var(--cat-media);"></div>
+              <span>Media (Video / Audio / Img)</span>
+            </div>
+            <div class="legend-pill" data-cat="dev">
+              <div class="legend-swatch" style="background: var(--cat-dev);"></div>
+              <span>Developer / Code</span>
+            </div>
+            <div class="legend-pill" data-cat="apps">
+              <div class="legend-swatch" style="background: var(--cat-apps);"></div>
+              <span>Apps & Programs</span>
+            </div>
+            <div class="legend-pill" data-cat="cache">
+              <div class="legend-swatch" style="background: var(--cat-cache);"></div>
+              <span>Temp & Junk Caches</span>
+            </div>
+            <div class="legend-pill" data-cat="documents">
+              <div class="legend-swatch" style="background: var(--cat-documents);"></div>
+              <span>Documents & PDFs</span>
+            </div>
+            <div class="legend-pill" data-cat="archives">
+              <div class="legend-swatch" style="background: var(--cat-archives);"></div>
+              <span>Archives (Zip / ISO)</span>
+            </div>
+          </div>
+          <div style="font-size: 0.78rem; color: var(--text-muted); font-family: var(--font-mono);">
+            Proportional Heatmap (Blocks sized by byte size)
+          </div>
+        </div>
+
+        <!-- Selected Node Inspector Drawer -->
+        <div class="node-inspector-bar" id="nodeInspectorBar">
+          <div class="inspector-info">
+            <div class="inspector-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
+            <div class="inspector-meta">
+              <h4>
+                <span id="inspectorName">Current Selection</span>
+                <span class="tooltip-category-pill" id="inspectorCategory"
+                  style="background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan);">FOLDER</span>
+              </h4>
+              <p id="inspectorPath">Select any block in the heatmap above to inspect properties</p>
+            </div>
+          </div>
+          <div class="inspector-actions">
+            <div style="text-align: right; margin-right: 1rem;">
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Size on Disk</div>
+              <div
+                style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800; color: var(--accent-cyan);"
+                id="inspectorSize">0 B</div>
+            </div>
+            <button class="btn-drilldown" id="btnInspectorDrill" style="display: none;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                <line x1="11" y1="8" x2="11" y2="14"></line>
+                <line x1="8" y1="11" x2="14" y2="11"></line>
+              </svg>
+              Explore Inside
+            </button>
+            <button class="btn-open-explorer" id="btnInspectorOpen">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              Reveal in Explorer
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= TAB 2: SMART CLEANER & RECLAIM HUB ================= -->
+    <section class="tab-view" id="viewCleaner" aria-label="Disk Cleanup Command Center">
+      <div class="cleaner-container">
+
+        <!-- Hero 1-Click Reclaim Action Banner -->
+        <div class="cleaner-hero-banner" id="cleanerHeroBanner">
+          <div class="hero-text-group">
+            <h2>
+              Reclaimable Disk Space: <span class="reclaim-highlight-pill" id="heroReclaimSize">Auditing...</span>
+            </h2>
+            <p>
+              Identified zero-risk temporary files, stale browser caches, and Windows telemetry logs ready to be
+              reclaimed without affecting personal data or Windows integrity.
+            </p>
+          </div>
+          <div class="hero-actions-group">
+            <button class="btn-primary-clean" id="btnPrimaryClean">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Reclaim All Safe Files
+            </button>
+          </div>
+        </div>
+
+        <!-- Cleaner Zones (Safe vs Review vs System Protected) -->
+        <div class="cleaner-sections-grid">
+
+          <!-- ZONE 1: 100% SAFE TO CLEAR (GREEN SHIELD) -->
+          <div class="clean-zone-card" id="zoneSafe">
+            <div class="zone-header">
+              <div class="zone-title-group">
+                <div class="zone-shield-icon shield-safe">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <polyline points="9 12 11 14 15 10"></polyline>
+                  </svg>
+                </div>
+                <div>
+                  <h3>Zone 1: Safe to Clear <span class="zone-badge badge-safe">ZERO RISK</span></h3>
+                  <p>Caches, logs, and temp files that Windows & apps recreate automatically.</p>
+                </div>
+              </div>
+              <div class="zone-selection-actions">
+                <button class="btn-select-all" id="btnSelectAllSafe">Select All</button>
+                <button class="btn-select-all" id="btnDeselectAllSafe">Deselect All</button>
+              </div>
+            </div>
+            <!-- Target list container for safe items -->
+            <div class="targets-list" id="safeTargetsList"></div>
+          </div>
+
+          <!-- ZONE 2: REVIEW BEFORE DELETING (AMBER SHIELD) -->
+          <div class="clean-zone-card" id="zoneReview">
+            <div class="zone-header">
+              <div class="zone-title-group">
+                <div class="zone-shield-icon shield-review">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                    </path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                </div>
+                <div>
+                  <h3>Zone 2: Review Before Deleting <span class="zone-badge badge-review">USER DISCRETION</span></h3>
+                  <p>Developer dependencies, old downloads, and local package caches.</p>
+                </div>
+              </div>
+            </div>
+            <div class="targets-list" id="reviewTargetsList"></div>
+          </div>
+
+          <!-- ZONE 3: SYSTEM DEFAULT & ESSENTIAL FILES (RED SHIELD - UNTOUCHABLE) -->
+          <div class="clean-zone-card" id="zoneProtected">
+            <div class="zone-header">
+              <div class="zone-title-group">
+                <div class="zone-shield-icon shield-protected">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                </div>
+                <div>
+                  <h3>Zone 3: System Protected & Default Files <span class="zone-badge badge-protected">LOCKED &
+                      PROTECTED</span></h3>
+                  <p>Windows core OS binaries, virtual paging files, and WinSxS store. Blocked from accidental deletion.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="targets-list" id="protectedTargetsList"></div>
+          </div>
+
+        </div>
+
+        <!-- Live Terminal Progress & Activity Log -->
+        <div class="cleaner-terminal-wrap" id="cleanerTerminalWrap">
+          <div class="terminal-header">
+            <div class="terminal-dots">
+              <div class="terminal-dot dot-red"></div>
+              <div class="terminal-dot dot-yellow"></div>
+              <div class="terminal-dot dot-green"></div>
+            </div>
+            <div class="terminal-title">Storage Manager Real-Time Activity Log</div>
+            <div style="font-size: 0.75rem; color: var(--accent-emerald);">● Live Host Connection</div>
+          </div>
+          <div class="terminal-logs-body" id="terminalLogs">
+            <div class="log-entry">
+              <span class="log-time">[System]</span>
+              <span class="log-info">Storage Manager ready. Connected to Windows Logical Disks C:\ and Z:\</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= TAB: DEVELOPER & BUILD ARTIFACTS HUNTER ================= -->
+    <section class="tab-view" id="viewDevHunter" aria-label="Developer & Build Artifacts Hunter">
+      <div class="cleaner-container">
+
+        <!-- 4 Top Stat Cards -->
+        <div class="dev-stat-grid">
+          <!-- Card 1: All node_modules -->
+          <div class="dev-stat-card" id="cardNodeModules">
+            <div class="dev-stat-header">
+              <span class="dev-stat-title">All node_modules</span>
+              <div class="dev-stat-icon icon-node">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path
+                    d="M16.5 9.4 7.55 4.24a1.78 1.78 0 0 0-2.5 1.55v12.42a1.78 1.78 0 0 0 2.5 1.55L16.5 14.6a1.78 1.78 0 0 0 0-3.2z">
+                  </path>
+                  <polyline points="21 7 21 17"></polyline>
+                </svg>
+              </div>
+            </div>
+            <div class="dev-stat-value" id="statNodeModulesSize" style="color: #06b6d4;">15.04 GB</div>
+            <div class="dev-stat-sub">
+              <strong id="statNodeModulesCount" style="color: var(--text-primary);">64</strong> projects • Can be
+              restored with <code>npm i</code>
+            </div>
+          </div>
+
+          <!-- Card 2: Web Builds (.next / dist) -->
+          <div class="dev-stat-card" id="cardWebBuilds">
+            <div class="dev-stat-header">
+              <span class="dev-stat-title">Web & Next.js Builds</span>
+              <div class="dev-stat-icon icon-web">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                  </path>
+                </svg>
+              </div>
+            </div>
+            <div class="dev-stat-value" id="statWebBuildsSize" style="color: #38bdf8;">11.23 GB</div>
+            <div class="dev-stat-sub">
+              <strong id="statWebBuildsCount" style="color: var(--text-primary);">29</strong> builds
+              (<code>.next</code>, <code>dist</code>, <code>build</code>)
+            </div>
+          </div>
+
+          <!-- Card 3: Mobile & Android Builds -->
+          <div class="dev-stat-card" id="cardMobileBuilds">
+            <div class="dev-stat-header">
+              <span class="dev-stat-title">Mobile & Android Builds</span>
+              <div class="dev-stat-icon icon-mobile">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                  <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                </svg>
+              </div>
+            </div>
+            <div class="dev-stat-value" id="statMobileBuildsSize" style="color: #a855f7;">1.45 GB</div>
+            <div class="dev-stat-sub">
+              <strong id="statMobileBuildsCount" style="color: var(--text-primary);">3+</strong> apps (Flutter
+              <code>.dart_tool</code>, Gradle <code>.gradle</code>)
+            </div>
+          </div>
+
+          <!-- Card 4: Python Virtualenvs -->
+          <div class="dev-stat-card" id="cardPythonVenvs">
+            <div class="dev-stat-header">
+              <span class="dev-stat-title">Python Virtualenvs</span>
+              <div class="dev-stat-icon icon-venv">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="4 17 10 11 4 5"></polyline>
+                  <line x1="12" y1="19" x2="20" y2="19"></line>
+                </svg>
+              </div>
+            </div>
+            <div class="dev-stat-value" id="statPythonVenvsSize" style="color: #f59e0b;">1.37 GB</div>
+            <div class="dev-stat-sub">
+              <strong id="statPythonVenvsCount" style="color: var(--text-primary);">39</strong> venvs
+              (<code>.venv</code>, <code>venv</code>, pycache)
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Reclaim Action Banner for Developer Builds -->
+        <div class="cleaner-hero-banner"
+          style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(18, 27, 47, 0.9) 100%); border-color: rgba(6, 182, 212, 0.35);">
+          <div class="hero-text-group">
+            <h2>
+              Reclaimable Developer Space: <span class="reclaim-highlight-pill" id="heroDevTotalSize"
+                style="background: var(--accent-cyan); color: #031e33;">29.09 GB</span>
+            </h2>
+            <p>
+              Build outputs (<code>.next</code>, <code>dist</code>, <code>build</code>, <code>.dart_tool</code>) and
+              dependencies (<code>node_modules</code>) can be safely purged. They are 100% regenerable by your build
+              tools anytime!
+            </p>
+          </div>
+          <div class="hero-actions-group" style="flex-wrap: wrap;">
+            <button class="btn-select-all" id="btnSelectAllBuilds" style="padding: 0.65rem 1rem; font-size: 0.85rem;">
+              Select All Web & Mobile Builds (12.7 GB)
+            </button>
+            <button class="btn-select-all" id="btnSelectAllNodeModules"
+              style="padding: 0.65rem 1rem; font-size: 0.85rem;">
+              Select All node_modules (15.0 GB)
+            </button>
+            <button class="btn-purge-selected" id="btnPurgeSelectedArtifacts" disabled>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              Purge Selected Build Caches
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="treemap-toolbar" style="margin-top: 0.5rem;">
+          <div class="view-mode-group">
+            <button class="view-mode-btn dev-filter-btn active" data-dev-filter="all" id="devFilterAll">All Artifacts
+              (135)</button>
+            <button class="view-mode-btn dev-filter-btn" data-dev-filter="node_modules" id="devFilterModules">📦
+              node_modules (64)</button>
+            <button class="view-mode-btn dev-filter-btn" data-dev-filter="web_build" id="devFilterWeb">🌐 Web Builds
+              (29)</button>
+            <button class="view-mode-btn dev-filter-btn" data-dev-filter="mobile_build" id="devFilterMobile">📱 Mobile
+              Builds (3)</button>
+            <button class="view-mode-btn dev-filter-btn" data-dev-filter="python_venv" id="devFilterVenv">🐍 Python
+              venvs (39)</button>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1; justify-content: flex-end;">
+            <input type="text" id="devArtifactSearch" class="custom-select"
+              placeholder="Search project (e.g. Farmer App, Verdicto, Aura)..." style="width: 320px;">
+            <button class="btn-select-all" id="btnDeselectAllArtifacts">Clear Selection</button>
+          </div>
+        </div>
+
+        <!-- Artifacts Table -->
+        <div
+          style="overflow-x: auto; background: rgba(8, 12, 22, 0.7); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem;">
+            <thead>
+              <tr
+                style="border-bottom: 1px solid var(--border-color); background: rgba(15, 23, 42, 0.6); color: var(--text-secondary); font-size: 0.78rem; text-transform: uppercase;">
+                <th style="padding: 0.85rem 1rem; width: 40px;">
+                  <input type="checkbox" id="chkDevSelectAllMaster" class="custom-checkbox"
+                    title="Select / Deselect Visible">
+                </th>
+                <th style="padding: 0.85rem 1rem;">Project & Build Target</th>
+                <th style="padding: 0.85rem 1rem; width: 160px;">Artifact Type</th>
+                <th style="padding: 0.85rem 1rem; width: 140px;">Size on Disk</th>
+                <th style="padding: 0.85rem 1rem; width: 110px;">Files</th>
+                <th style="padding: 0.85rem 1rem; width: 180px; text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="devArtifactsTbody">
+              <!-- Rendered dynamically by app.js -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= TAB 3: LARGEST FILES LEADERBOARD ================= -->
+    <section class="tab-view" id="viewLeaderboard" aria-label="Largest Space Consumers">
+      <div class="treemap-module">
+        <div class="treemap-toolbar">
+          <div>
+            <h3 style="font-family: var(--font-display); font-size: 1.3rem;">Largest Space Consumers</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">Top files on your system consuming significant
+              gigabytes.</p>
+          </div>
+
+          <div class="toolbar-actions">
+            <!-- Search Input -->
+            <input type="text" id="largestFileSearch" class="custom-select"
+              placeholder="Filter files by name or extension..." style="width: 280px;">
+
+            <!-- Category Filter Pills -->
+            <div class="view-mode-group">
+              <button class="view-mode-btn leaderboard-filter-pill active" data-filter="all">All</button>
+              <button class="view-mode-btn leaderboard-filter-pill" data-filter="media">Media</button>
+              <button class="view-mode-btn leaderboard-filter-pill" data-filter="apps">Apps</button>
+              <button class="view-mode-btn leaderboard-filter-pill" data-filter="archives">Archives</button>
+              <button class="view-mode-btn leaderboard-filter-pill" data-filter="dev">Dev</button>
+            </div>
+
+            <span class="pro-badge" id="largestFilesCount">0 items</span>
+          </div>
+        </div>
+
+        <!-- Table Container -->
+        <div
+          style="overflow-x: auto; background: rgba(8, 12, 22, 0.7); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem;">
+            <thead>
+              <tr
+                style="border-bottom: 1px solid var(--border-color); background: rgba(15, 23, 42, 0.6); color: var(--text-secondary); font-size: 0.78rem; text-transform: uppercase;">
+                <th style="padding: 0.85rem 1rem; width: 50px;">#</th>
+                <th style="padding: 0.85rem 1rem;">File Name & Path</th>
+                <th style="padding: 0.85rem 1rem; width: 140px;">Size</th>
+                <th style="padding: 0.85rem 1rem; width: 120px;">Category</th>
+                <th style="padding: 0.85rem 1rem; width: 110px; text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="largestFilesTbody">
+              <!-- Rendered by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 4: SYSTEM PROTECTION & SAFETY RULES ================= -->
+    <section class="tab-view" id="viewSystemInfo" aria-label="System Protection Rules">
+      <div class="cleaner-sections-grid">
+        <div class="clean-zone-card">
+          <div class="zone-header">
+            <div class="zone-title-group">
+              <div class="zone-shield-icon shield-protected">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3>Understanding System Protected Files</h3>
+                <p>How Windows organizes disk space and why core files are safely isolated.</p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; line-height: 1.6; font-size: 0.9rem; color: var(--text-secondary);">
+            <div
+              style="background: rgba(255,255,255,0.02); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+              <h4
+                style="color: var(--accent-rose); font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 0.5rem;">
+                C:\Windows\WinSxS (Component Store)</h4>
+              <p>The WinSxS folder contains components needed to customize and update Windows. Windows automatically
+                analyzes and cleans this folder periodically. Never delete this folder manually. To safely shrink it,
+                use Windows built-in command:</p>
+              <pre
+                style="background: #040711; padding: 0.5rem; border-radius: 4px; margin-top: 0.5rem; font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-cyan);">Dism.exe /online /Cleanup-Image /StartComponentCleanup</pre>
+            </div>
+
+            <div
+              style="background: rgba(255,255,255,0.02); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+              <h4
+                style="color: var(--accent-amber); font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 0.5rem;">
+                hiberfil.sys & Fast Startup</h4>
+              <p>The hibernation file stores RAM state for Fast Startup. It typically takes 40% to 80% of your RAM size
+                (6 GB to 12 GB). If you don't use Hibernation, you can safely turn it off in PowerShell as
+                administrator:</p>
+              <pre
+                style="background: #040711; padding: 0.5rem; border-radius: 4px; margin-top: 0.5rem; font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-cyan);">powercfg -h off</pre>
+            </div>
+
+            <div
+              style="background: rgba(255,255,255,0.02); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+              <h4
+                style="color: var(--accent-cyan); font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 0.5rem;">
+                Windows Storage Sense Automation</h4>
+              <p>Windows 11 includes native Storage Sense to continuously purge temporary files and cloud-backed files
+                that haven't been used. You can configure it directly by clicking the <strong>Storage Sense</strong>
+                button in the top header.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= Toast Notifications Container ================= -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="js/treemap.js"></script>
+  <script src="js/cleaner.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>
